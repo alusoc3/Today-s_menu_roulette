@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>献立ルーレット</title>
+
+    <!-- CSS読み込み -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- JavaScript読み込み -->
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+    <h1>🍽️ 本日の献立ルーレット 🍽️</h1>
+    <p style="font-size: 16px;">ジャンルを選んでルーレットを回そう！お気に入りはキープできます。</p>
+
+    <!-- 一括ジャンル設定 -->
+    <div style="margin-bottom: 15px;">
+        <span style="font-size: 15px; font-weight: bold; color: #555;">全カテゴリ一括設定:</span><br>
+        <button class="sync-btn" onclick="syncAllGenres('all')">すべて指定解除</button>
+        <button class="sync-btn" onclick="syncAllGenres('japanese')">すべて和食</button>
+        <button class="sync-btn" onclick="syncAllGenres('western')">すべて洋食</button>
+        <button class="sync-btn" onclick="syncAllGenres('chinese')">すべて中華</button>
+    </div>
+
+    <!-- アレルギー設定 -->
+    <div class="card">
+        <div class="sub-group">
+            <span class="section-title">🛡️ アレルギー・避けたい食材の除外（29品目）</span>
+
+            <div class="radio-options">
+                <label><input type="radio" name="allergy-choice" value="none" checked onchange="toggleGroup()"> なし</label>
+                <label><input type="radio" name="allergy-choice" value="exist" onchange="toggleGroup()"> あり</label>
+
+                <p style="color: red; font-size: 14px; margin-top: 10px; line-height: 1.6;">
+                    ※選択されたものがレシピに入ってしまうことが稀にあります。実際の原材料やアレルゲン表示を必ず確認してください。
+                </p>
+            </div>
+
+            <div id="allergy-options" class="expandable-options">
+                <div class="allergy-grid">
+                    <label><input type="checkbox" name="exclude" value="egg"> 卵</label>
+                    <label><input type="checkbox" name="exclude" value="milk"> 乳</label>
+                    <label><input type="checkbox" name="exclude" value="wheat"> 小麦</label>
+                    <label><input type="checkbox" name="exclude" value="soba"> そば</label>
+                    <label><input type="checkbox" name="exclude" value="peanut"> 落花生</label>
+                    <label><input type="checkbox" name="exclude" value="ebi"> えび</label>
+                    <label><input type="checkbox" name="exclude" value="kani"> かに</label>
+                    <label><input type="checkbox" name="exclude" value="walnut"> くるみ</label>
+                    <label><input type="checkbox" name="exclude" value="cashewnuts"> カシューナッツ</label>
+                    <label><input type="checkbox" name="exclude" value="almond"> アーモンド</label>
+                    <label><input type="checkbox" name="exclude" value="awabi"> あわび</label>
+                    <label><input type="checkbox" name="exclude" value="ika"> いか</label>
+                    <label><input type="checkbox" name="exclude" value="ikura"> いくら</label>
+                    <label><input type="checkbox" name="exclude" value="orange"> オレンジ</label>
+                    <label><input type="checkbox" name="exclude" value="kiwi"> キウイ</label>
+                    <label><input type="checkbox" name="exclude" value="beef"> 牛肉</label>
+                    <label><input type="checkbox" name="exclude" value="goma"> ごま</label>
+                    <label><input type="checkbox" name="exclude" value="sake"> さけ</label>
+                    <label><input type="checkbox" name="exclude" value="saba"> さば</label>
+                    <label><input type="checkbox" name="exclude" value="daizu"> 大豆</label>
+                    <label><input type="checkbox" name="exclude" value="chicken"> 鶏肉</label>
+                    <label><input type="checkbox" name="exclude" value="banana"> バナナ</label>
+                    <label><input type="checkbox" name="exclude" value="pistachio"> ピスタチオ</label>
+                    <label><input type="checkbox" name="exclude" value="pork"> 豚肉</label>
+                    <label><input type="checkbox" name="exclude" value="macadamianuts"> マカダミア</label>
+                    <label><input type="checkbox" name="exclude" value="momo"> もも</label>
+                    <label><input type="checkbox" name="exclude" value="yamaimo"> やまいも</label>
+                    <label><input type="checkbox" name="exclude" value="ringo"> りんご</label>
+                    <label><input type="checkbox" name="exclude" value="gelatin"> ゼラチン</label>
+                </div>
+            </div>
+
+            <button class="black-nav-btn" onclick="scrollToRoulette()">アレルギーを選択してルーレットへ ▼</button>
+        </div>
+    </div>
+
+    <!-- ルーレット -->
+    <div id="roulette-section">
+        <button id="spin-btn" onclick="spinRoulette()">ルーレットを回す！</button>
+    </div>
+
+    <!-- 結果表示 -->
+    <div class="card">
+
+        <!-- 主菜 -->
+        <div id="main-container" class="menu-item">
+            <img id="main-img" class="menu-img"
+                 src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200"
+                 alt="主菜画像">
+
+            <div class="menu-info">
+                <div class="label-container">
+                    <span class="label">【主菜】</span>
+                    <div class="button-group">
+                        <button class="toggle-btn active" onclick="toggleDisplay('main')">表示: ON</button>
+                        <button class="keep-btn" onclick="toggleKeep('main')" disabled>🔒 キープ</button>
+                    </div>
+                </div>
+
+                <div class="genre-btn-container">
+                    <div class="genre-btn-group" id="main-genre-group">
+                        <button class="genre-btn" data-genre="japanese" onclick="toggleGenreBtn('main', 'japanese')">和食</button>
+                        <button class="genre-btn" data-genre="western" onclick="toggleGenreBtn('main', 'western')">洋食</button>
+                        <button class="genre-btn" data-genre="chinese" onclick="toggleGenreBtn('main', 'chinese')">中華</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dish-bottom">
+                <div id="main-result" class="dish-name">ここに表示されます</div>
+                <a id="main-recipe" class="recipe-link" href="#" target="_blank" style="display:none;">🍳 クックパッドで検索</a>
+            </div>
+        </div>
+
+        <!-- 副菜 -->
+        <div id="side-container" class="menu-item">
+            <img id="side-img" class="menu-img"
+                 src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200"
+                 alt="副菜画像">
+
+            <div class="menu-info">
+                <div class="label-container">
+                    <span class="label">【副菜】</span>
+                    <div class="button-group">
+                        <button class="toggle-btn active" onclick="toggleDisplay('side')">表示: ON</button>
+                        <button class="keep-btn" onclick="toggleKeep('side')" disabled>🔒 キープ</button>
+                    </div>
+                </div>
+
+                <div class="genre-btn-container">
+                    <div class="genre-btn-group" id="side-genre-group">
+                        <button class="genre-btn" data-genre="japanese" onclick="toggleGenreBtn('side', 'japanese')">和食</button>
+                        <button class="genre-btn" data-genre="western" onclick="toggleGenreBtn('side', 'western')">洋食</button>
+                        <button class="genre-btn" data-genre="chinese" onclick="toggleGenreBtn('side', 'chinese')">中華</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dish-bottom">
+                <div id="side-result" class="dish-name">ここに表示されます</div>
+                <a id="side-recipe" class="recipe-link" href="#" target="_blank" style="display:none;">🍳 クックパッドで検索</a>
+            </div>
+        </div>
+
+        <!-- デザート -->
+        <div id="dessert-container" class="menu-item">
+            <img id="dessert-img" class="menu-img"
+                 src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=200"
+                 alt="デザート画像">
+
+            <div class="menu-info">
+                <div class="label-container">
+                    <span class="label">【デザート】</span>
+                    <div class="button-group">
+                        <button class="toggle-btn active" onclick="toggleDisplay('dessert')">表示: ON</button>
+                        <button class="keep-btn" onclick="toggleKeep('dessert')" disabled>🔒 キープ</button>
+                    </div>
+                </div>
+
+                <div class="genre-btn-container">
+                    <div class="genre-btn-group" id="dessert-genre-group">
+                        <button class="genre-btn" data-genre="japanese" onclick="toggleGenreBtn('dessert', 'japanese')">和食</button>
+                        <button class="genre-btn" data-genre="western" onclick="toggleGenreBtn('dessert', 'western')">洋食</button>
+                        <button class="genre-btn" data-genre="chinese" onclick="toggleGenreBtn('dessert', 'chinese')">中華</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dish-bottom">
+                <div id="dessert-result" class="dish-name">ここに表示されます</div>
+                <a id="dessert-recipe" class="recipe-link" href="#" target="_blank" style="display:none;">🍳 クックパッドで検索</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="source-credit">
+        出典：クックパッド, Adobe Stock
+    </div>
+
+</body>
+</html>
